@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <title>Perpustakaan Pengetahuan — DermLogic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./public/css/dermlogic.css">
+</head>
+<body>
+<header class="hero hero-sm"><div class="w"><a class="back" href="./">← Kembali ke konsultasi</a><span class="badge">📚 Knowledge base</span>
+<h1>Perpustakaan pengetahuan kulit</h1><p>Ringkasan topik perawatan kulit yang mudah dicari: penyebab umum, tanda yang sering muncul, langkah perawatan, dan kapan sebaiknya menemui tenaga kesehatan.</p></div></header>
+<div class="w page">
+<div class="kb-stats" id="kbStats"></div>
+<div class="card search">
+<h2>Jelajahi topik</h2><p class="hint">Cari berdasarkan judul, gejala, penyebab, atau cara mengatasi. Pilih kategori untuk mempersempit daftar.</p>
+<input type="search" id="kbQ" placeholder="Contoh: niacinamide, kulit perih, pori besar" autocomplete="off">
+<div class="kb-tools"><select id="kbCat" aria-label="Filter kategori"></select><button type="button" class="kb-link" id="kbReset">↺ Reset filter</button><button type="button" class="kb-link" id="kbToggle">Buka semua</button></div>
+<div class="kb-cats" id="kbCats"></div>
+<p class="hint" id="kbCount" style="margin:10px 0 0"></p>
+</div>
+<div id="kbList" class="know-list"></div>
+<div class="note good" style="margin-top:14px">💡 Ingin ringkasan yang disesuaikan dengan profil kulit Anda? <a href="./">Mulai konsultasi</a>. Untuk memeriksa sumber ilmiah setiap topik, buka <a href="./referensi">Daftar Referensi</a>.</div>
+<div class="note">Halaman ini murni edukasi umum. Tidak ada konsultasi, tidak ada diagnosis, dan tidak menggantikan pemeriksaan dokter kulit. Bila keluhan menetap atau memberat, temui tenaga kesehatan.</div>
+<p class="hint" style="margin:20px 0;text-align:center">© 2026 DermLogic. Alat edukasi, bukan pengganti pemeriksaan dokter kulit.</p>
+</div>
+<script src="./public/js/dermlogic/data.js"></script>
+<script src="./public/js/dermlogic/knowledge.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const REF_URL="./referensi";
+const cats=[...new Set(KNOWLEDGE.map(k=>k.cat))],refs=new Set(KNOWLEDGE.flatMap(k=>k.ref));
+$("#kbStats").innerHTML=`<div class="kb-stat"><b>${KNOWLEDGE.length}</b><span>Topik pengetahuan</span></div><div class="kb-stat"><b>${cats.length}</b><span>Kategori topik</span></div><div class="kb-stat"><b>${refs.size}</b><span>Rujukan unik</span></div>`;
+const q=$("#kbQ"),sel=$("#kbCat"),chips=$("#kbCats"),list=$("#kbList"),count=$("#kbCount"),toggle=$("#kbToggle");
+sel.innerHTML='<option value="">Semua kategori</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+chips.innerHTML='<button type="button" class="kb-cat on" data-cat="">Semua</button>'+cats.map(c=>`<button type="button" class="kb-cat" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+const ul=a=>a.length?`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:'<p class="hint">Tidak ada catatan khusus.</p>';
+function draw(){
+ const term=q.value.trim().toLowerCase(),c=sel.value;
+ [...chips.children].forEach(b=>b.classList.toggle("on",b.dataset.cat===c));
+ const items=KNOWLEDGE.filter(k=>(!c||k.cat===c)&&(!term||[k.n,k.cat,k.sum,...k.cause,...k.sign,...k.care,k.doctor].join(" ").toLowerCase().includes(term)));
+ count.textContent=`Menampilkan ${items.length} dari ${KNOWLEDGE.length} topik${c?" · "+c:""}`;
+ list.innerHTML=items.map((k,i)=>`<details class="know-card" ${i<3?"open":""}><summary><span class="tag">${esc(k.cat)}</span><b>${esc(k.n)}</b><small>${esc(k.sum)}</small></summary><div class="know-body">
+ <div class="know-col"><h4>Penyebab umum</h4>${ul(k.cause)}</div>
+ <div class="know-col"><h4>Tanda yang sering muncul</h4>${ul(k.sign)}</div>
+ <div class="know-col ok"><h4>Cara mengatasi (edukasi)</h4>${ul(k.care)}</div>
+ <div class="know-col warn"><h4>Kapan perlu bantuan tenaga kesehatan</h4><p>${esc(k.doctor)}</p>${k.ref.length?`<p class="know-ref">Rujukan: ${k.ref.map(n=>`<a href="${REF_URL}" title="${esc(REFS[n]||"")}">[${n}]</a>`).join(" ")}</p>`:""}</div>
+ </div></details>`).join("")||'<div class="card"><p>Tidak ada topik yang cocok dengan pencarian Anda.</p></div>';
+ toggle.textContent="Buka semua";
+}
+q.oninput=draw;sel.onchange=draw;
+chips.onclick=e=>{const b=e.target.closest(".kb-cat");if(!b)return;sel.value=b.dataset.cat;draw()};
+$("#kbReset").onclick=()=>{q.value="";sel.value="";draw();q.focus()};
+toggle.onclick=()=>{const ds=[...list.querySelectorAll("details")],open=ds.length>0&&ds.every(d=>d.open);ds.forEach(d=>d.open=!open);toggle.textContent=open?"Buka semua":"Tutup semua"};
+draw();
+</script>
+</body>
+</html>

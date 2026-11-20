@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="csrf-token" content="">
+    <meta name="ai-url" content="/ai/tanya">
+    <title>DermLogic — Skincare Personalmu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./public/build/assets/app-C0ScTU9F.css">
+    <link rel="stylesheet" href="./public/css/dermlogic.css">
+</head>
+<body>
+<header class="hero"><div class="w hero-in">
+<div class="hero-top"><span class="brand">✦ DermLogic</span><span class="badge">Sistem pakar · berbasis jurnal</span><button type="button" class="hero-ai no-print inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-bold text-blue-900 shadow-sm transition" id="openChat"><span aria-hidden="true">💬</span> Tanya Pakar AI</button></div>
+<h1>Skincare yang pas,<br><em>tanpa tebakan.</em></h1>
+<p>Ceritakan kondisi kulit Anda. Kami susun dugaan kondisi, langkah perawatan, dan rekomendasi bahan aktif yang bisa dipertanggungjawabkan.</p>
+</div></header>
+<div class="w"><nav><button class="on">01 · Konsultasi</button><button>02 · Hasil</button><a href="./pengetahuan">03 · Knowledge Base ↗</a><a href="./referensi">04 · Referensi ↗</a></nav>
+<main id="v0"><form id="f" class="noprint"></form></main>
+<main id="v1" hidden><div class="card"><p>Belum ada hasil. Isi formulir konsultasi terlebih dahulu.</p></div></main>
+<p class="hint" style="margin:20px 0;text-align:center">© 2026 DermLogic. Alat edukasi, bukan pengganti pemeriksaan dokter kulit.</p></div>
+<div class="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-sm no-print" id="chatModal" hidden>
+<div class="flex h-full w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl" role="dialog" aria-modal="true" aria-label="Tanya Pakar AI">
+<div class="flex items-start justify-between gap-3 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-white px-5 py-4">
+<div><p class="font-display text-lg font-extrabold text-blue-950">💬 Tanya Pakar AI</p><p class="mt-1 text-xs leading-relaxed text-slate-500">Asisten berbasis jurnal. Riwayat chat tersimpan selama sesi ini.</p></div>
+<div class="flex gap-2"><button type="button" class="grid h-8 w-8 place-items-center rounded-full bg-blue-100 font-bold text-blue-900 transition hover:bg-blue-200" id="clearChat" aria-label="Hapus riwayat chat" title="Hapus riwayat chat">↺</button><button type="button" class="grid h-8 w-8 place-items-center rounded-full bg-blue-100 font-bold text-blue-900 transition hover:bg-blue-200" id="closeChat" aria-label="Tutup">✕</button></div>
+</div>
+<div class="flex-1 overflow-y-auto px-5 py-4">
+<div class="sticky top-0 z-10 mb-4 grid grid-cols-[1fr_auto] gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur">
+<textarea id="chatQ" class="min-h-[64px] w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-500" placeholder="Misalnya: apakah niacinamide aman dipakai bersama vitamin C untuk kulit saya?"></textarea>
+<button type="button" class="self-start rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-800" id="chatSend">Kirim</button>
+</div>
+<div id="chatOut" class="space-y-3 text-sm text-slate-700" hidden></div>
+</div>
+</div>
+</div>
+<script src="./public/js/vendor/html2canvas.min.js"></script>
+<script src="./public/js/vendor/jspdf.umd.min.js"></script>
+<script src="./public/js/dermlogic/data.js"></script>
+<script src="./public/js/dermlogic/engine.js"></script>
+<script src="./public/js/dermlogic/app.js"></script>
+</body>
+</html>

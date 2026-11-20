@@ -28,6 +28,11 @@ for (const file of ['favicon.ico', 'robots.txt']) {
   fs.copyFileSync(path.join(root, 'public', file), path.join(distDir, file));
 }
 
+const apiSource = path.join(root, 'api');
+if (fs.existsSync(apiSource)) {
+  fs.cpSync(apiSource, path.join(distDir, 'api'), { recursive: true });
+}
+
 const pages = [
   ['index.blade.php', 'index.html'],
   ['pengetahuan.blade.php', 'pengetahuan.html'],
@@ -38,7 +43,7 @@ const render = (view, prefix) => {
   let html = fs.readFileSync(path.join(root, 'resources/views/dermlogic', view), 'utf8');
   const replacements = [
     [/<meta name="csrf-token" content="[^"]*">/g, '<meta name="csrf-token" content="">'],
-    [/<meta name="ai-url" content="[^"]*">/g, '<meta name="ai-url" content="/ai/tanya">'],
+    [/<meta name="ai-url" content="[^"]*">/g, '<meta name="ai-url" content="/api/tanya">'],
     [/@vite\(\[[^\]]*\]\)/g, `<link rel="stylesheet" href="${prefix}build/${cssFile}">`],
     [/\{\{\s*asset\('([^']+)'\)\s*\}\}/g, (_, asset) => `${prefix}${asset}`],
     [/\{\{\s*route\('ai\.ask'\)\s*\}\}/g, '/ai/tanya'],

@@ -177,7 +177,11 @@ class JournalAiService
     private function matches(string $haystack, array $keywords): bool
     {
         foreach ($keywords as $keyword) {
-            if (str_contains($haystack, $keyword)) {
+            if (mb_strlen($keyword) <= 2) {
+                if (preg_match('/\b'.preg_quote($keyword, '/').'\b/u', $haystack)) {
+                    return true;
+                }
+            } elseif (str_contains($haystack, $keyword)) {
                 return true;
             }
         }

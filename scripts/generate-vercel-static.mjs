@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const buildDir = path.join(root, 'public/build');
+const distDir = path.join(root, 'dist');
 const manifestPath = path.join(buildDir, 'manifest.json');
 
 if (!fs.existsSync(manifestPath)) {
@@ -16,18 +17,16 @@ if (!cssFile) {
   throw new Error('Entri CSS Vite tidak ditemukan dalam manifest.');
 }
 
-const viteTags = `<link rel="stylesheet" href="./public/build/${cssFile}">`;
+fs.rmSync(distDir, { recursive: true, force: true });
+fs.mkdirSync(distDir, { recursive: true });
 
-const replacements = [
-  [/<meta name="csrf-token" content="[^"]*">/g, '<meta name="csrf-token" content="">'],
-  [/<meta name="ai-url" content="[^"]*">/g, '<meta name="ai-url" content="/ai/tanya">'],
-  [/@vite\(\[[^\]]*\]\)/g, viteTags],
-  [/\{\{\s*asset\('([^']+)'\)\s*\}\}/g, (_, asset) => `./public/${asset}`],
-  [/\{\{\s*route\('ai\.ask'\)\s*\}\}/g, '/ai/tanya'],
-  [/\{\{\s*route\('pengetahuan'\)\s*\}\}/g, './pengetahuan'],
-  [/\{\{\s*route\('referensi'\)\s*\}\}/g, './referensi'],
-  [/\{\{\s*route\('home'\)\s*\}\}/g, './'],
-];
+for (const dir of ['build', 'css', 'js']) {
+  fs.cpSync(path.join(root, 'public', dir), path.join(distDir, dir), { recursive: true });
+}
+
+for (const file of ['favicon.ico', 'robots.txt']) {
+  fs.copyFileSync(path.join(root, 'public', file), path.join(distDir, file));
+}
 
 const pages = [
   ['index.blade.php', 'index.html'],
@@ -35,9 +34,18 @@ const pages = [
   ['referensi.blade.php', 'referensi.html'],
 ];
 
-for (const [view, output] of pages) {
-  const source = path.join(root, 'resources/views/dermlogic', view);
-  let html = fs.readFileSync(source, 'utf8');
+const render = (view, prefix) => {
+  let html = fs.readFileSync(path.join(root, 'resources/views/dermlogic', view), 'utf8');
+  const replacements = [
+    [/<meta name="csrf-token" content="[^"]*">/g, '<meta name="csrf-token" content="">'],
+    [/<meta name="ai-url" content="[^"]*">/g, '<meta name="ai-url" content="/ai/tanya">'],
+    [/@vite\(\[[^\]]*\]\)/g, `<link rel="stylesheet" href="${prefix}build/${cssFile}">`],
+    [/\{\{\s*asset\('([^']+)'\)\s*\}\}/g, (_, asset) => `${prefix}${asset}`],
+    [/\{\{\s*route\('ai\.ask'\)\s*\}\}/g, '/ai/tanya'],
+    [/\{\{\s*route\('pengetahuan'\)\s*\}\}/g, './pengetahuan'],
+    [/\{\{\s*route\('referensi'\)\s*\}\}/g, './referensi'],
+    [/\{\{\s*route\('home'\)\s*\}\}/g, './'],
+  ];
 
   for (const [pattern, replacement] of replacements) {
     html = html.replace(pattern, replacement);
@@ -47,6 +55,11 @@ for (const [view, output] of pages) {
     throw new Error(`Blade directive tersisa pada ${view}`);
   }
 
-  fs.writeFileSync(path.join(root, output), html);
-  console.log(`generated ${output}`);
+  return html;
+};
+
+for (const [view, output] of pages) {
+  fs.writeFileSync(path.join(root, output), render(view, './public/'));
+  fs.writeFileSync(path.join(distDir, output), render(view, './'));
+  console.log(`generated ${output} and dist/${output}`);
 }

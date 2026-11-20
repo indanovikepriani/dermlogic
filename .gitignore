@@ -7,6 +7,7 @@
 .phpunit.result.cache
 /.fleet
 /.vercel
+/dist
 /.idea
 /.nova
 /.phpunit.cache
@@ -23,3 +24,5 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+.vercel

@@ -8,12 +8,23 @@
     <link rel="stylesheet" href="./public/css/dermlogic.css">
 </head>
 <body>
-<header class="hero hero-sm"><div class="w"><a class="back" href="./">← Kembali ke konsultasi</a><span class="badge">📚 Knowledge base</span>
-<h1>Perpustakaan pengetahuan kulit</h1><p>Ringkasan topik perawatan kulit yang mudah dicari: penyebab umum, tanda yang sering muncul, langkah perawatan, dan kapan sebaiknya menemui tenaga kesehatan.</p></div></header>
+<header class="hero hero-sm"><div class="w"><a class="back" href="./">← Kembali ke konsultasi</a><span class="badge">Knowledge base &amp; aturan pakar</span>
+<h1>Basis Pengetahuan &amp; Kaidah IF–THEN</h1><p>Memuat variabel working memory, tabel parameter dan fakta, serta kaidah produksi R1–R15 yang dipakai mesin forward chaining DermLogic.</p></div></header>
 <div class="w page">
 <div class="kb-stats" id="kbStats"></div>
-<div class="card search">
-<h2>Jelajahi topik</h2><p class="hint">Cari berdasarkan judul, gejala, penyebab, atau cara mengatasi. Pilih kategori untuk mempersempit daftar.</p>
+<section class="card" style="margin-top:14px">
+<h2>Tabel Parameter &amp; Fakta Basis Pengetahuan</h2><p class="hint">Variabel L, K/B, U/T, dan A/M menjadi fakta awal pada working memory sebelum inferensi dijalankan.</p>
+<div id="varGroups" class="var-grid"></div>
+</section>
+<section class="card" style="margin-top:14px">
+<h2>Kaidah Produksi R1–R15 — Format Formal IF–AND–THEN</h2><p class="hint">Aturan dengan satu premis ditulis <b>IF ... THEN</b>; aturan dengan beberapa premis memakai <b>AND</b>. Kartu tambahan A1–A3 dan R34–R38 tersedia pada filter <b>Usia &amp; Makeup</b>.</p>
+<div class="search"><input type="search" id="ruleQ" placeholder="Cari kode rule, premis, konklusi, atau rasional: R1, TEWL, polusi, tidur" autocomplete="off"></div>
+<div class="kb-cats" id="ruleFilters"><button type="button" class="kb-cat on" data-filter="Semua Rule">Semua Rule</button><button type="button" class="kb-cat" data-filter="Lingkungan">Lingkungan</button><button type="button" class="kb-cat" data-filter="Jenis Kulit">Jenis Kulit</button><button type="button" class="kb-cat" data-filter="Jam Tidur">Jam Tidur</button><button type="button" class="kb-cat" data-filter="Usia &amp; Makeup">Usia &amp; Makeup</button></div>
+<p class="hint" id="ruleCount" style="margin:10px 0 0"></p>
+<div id="ruleList" class="know-list" style="margin-top:12px"></div>
+</section>
+<div class="card search" style="margin-top:14px">
+<h2>Jelajahi topik edukasi</h2><p class="hint">Cari berdasarkan judul, gejala, penyebab, atau cara mengatasi. Pilih kategori untuk mempersempit daftar.</p>
 <input type="search" id="kbQ" placeholder="Contoh: niacinamide, kulit perih, pori besar" autocomplete="off">
 <div class="kb-tools"><select id="kbCat" aria-label="Filter kategori"></select><button type="button" class="kb-link" id="kbReset">↺ Reset filter</button><button type="button" class="kb-link" id="kbToggle">Buka semua</button></div>
 <div class="kb-cats" id="kbCats"></div>
@@ -25,13 +36,15 @@
 <p class="hint" style="margin:20px 0;text-align:center">© 2026 DermLogic. Alat edukasi, bukan pengganti pemeriksaan dokter kulit.</p>
 </div>
 <script src="./public/js/dermlogic/data.js"></script>
+<script src="./public/js/dermlogic/rules.js"></script>
 <script src="./public/js/dermlogic/knowledge.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const REF_URL="./referensi";
 const cats=[...new Set(KNOWLEDGE.map(k=>k.cat))],refs=new Set(KNOWLEDGE.flatMap(k=>k.ref));
-$("#kbStats").innerHTML=`<div class="kb-stat"><b>${KNOWLEDGE.length}</b><span>Topik pengetahuan</span></div><div class="kb-stat"><b>${cats.length}</b><span>Kategori topik</span></div><div class="kb-stat"><b>${refs.size}</b><span>Rujukan unik</span></div>`;
+const coreRules=RULES.filter(r=>/^R\d+$/.test(r[0])&&Number(r[0].slice(1))>=1&&Number(r[0].slice(1))<=15);
+$("#kbStats").innerHTML=`<div class="kb-stat"><b>${KNOWLEDGE.length}</b><span>Topik pengetahuan</span></div><div class="kb-stat"><b>${cats.length}</b><span>Kategori topik</span></div><div class="kb-stat"><b>${refs.size}</b><span>Rujukan unik</span></div><div class="kb-stat"><b>${coreRules.length}</b><span>Kaidah inti R1–R15</span></div>`;
 const q=$("#kbQ"),sel=$("#kbCat"),chips=$("#kbCats"),list=$("#kbList"),count=$("#kbCount"),toggle=$("#kbToggle");
 sel.innerHTML='<option value="">Semua kategori</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
 chips.innerHTML='<button type="button" class="kb-cat on" data-cat="">Semua</button>'+cats.map(c=>`<button type="button" class="kb-cat" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
